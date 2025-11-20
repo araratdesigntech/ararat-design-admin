@@ -30,8 +30,8 @@ class CategoryAPI {
             return `http://${hostname}:8000/api/v1`;
         }
 
-        // Production or if already on port 8000 - use origin-based approach
-        return `${window.location.origin.replace(/\/admin.*/i, '')}/api/v1`;
+        // Production API URL
+        return 'https://api.araratdesigns.org/api/v1';
     }
 
     /**
