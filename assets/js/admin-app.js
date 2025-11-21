@@ -23,6 +23,10 @@
   };
 
   const API_BASE_URL = detectApiBaseUrl();
+  
+  // Debug: Log the detected API URL (remove in production if desired)
+  console.log('[AdminApp] Detected API Base URL:', API_BASE_URL);
+  console.log('[AdminApp] Current hostname:', window.location.hostname);
 
   const STORAGE_KEY = 'admin_session';
 

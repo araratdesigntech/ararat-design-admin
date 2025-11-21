@@ -6,6 +6,9 @@
 class ProductAPI {
     constructor() {
         this.apiBaseUrl = this.detectApiBaseUrl();
+        // Debug: Log the detected API URL
+        console.log('[ProductAPI] Detected API Base URL:', this.apiBaseUrl);
+        console.log('[ProductAPI] Current hostname:', window.location.hostname);
     }
 
     /**
