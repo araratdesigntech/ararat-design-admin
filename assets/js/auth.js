@@ -9,26 +9,18 @@ class AdminAuth {
         this.sessionTimeout = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
         this.isAuthenticated = false;
         const detectApiBaseUrl = () => {
-            // Check for explicit configuration first
-            if (window.ADMIN_API_BASE_URL) {
-                return window.ADMIN_API_BASE_URL.replace(/\/$/, '');
-            }
-            if (window.ARARAT_API_BASE_URL) {
-                return window.ARARAT_API_BASE_URL.replace(/\/$/, '');
-            }
+            if (window.getAraratApiBaseUrl) return window.getAraratApiBaseUrl();
+            if (window.ARARAT_API_BASE_URL) return window.ARARAT_API_BASE_URL.replace(/\/$/, '');
+            if (window.ADMIN_API_BASE_URL) return window.ADMIN_API_BASE_URL.replace(/\/$/, '');
 
-            // If running on localhost/127.0.0.1 with a development server port (like 5500, 3000, etc.)
-            // default to backend port 8000
+            // Last-resort fallback
             const hostname = window.location.hostname;
-            const port = window.location.port;
-            
-            if ((hostname === 'localhost' || hostname === '127.0.0.1') && port && port !== '8000') {
-                // Development mode - use backend port 8000
-                return `http://${hostname}:8000/api/v1`;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return `http://${hostname}:800/api/v1`;
             }
 
-            // Production API URL
-            return 'https://api.araratdesigns.org/api/v1';
+            // Prefer central getter or globals; last-resort fallback to localhost
+            return (window.getAraratApiBaseUrl && window.getAraratApiBaseUrl()) || window.ARARAT_API_BASE_URL || window.ADMIN_API_BASE_URL || `http://${hostname}:800/api/v1`;
         };
 
         this.apiBaseUrl = detectApiBaseUrl();

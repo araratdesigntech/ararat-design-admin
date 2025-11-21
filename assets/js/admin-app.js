@@ -1,25 +1,22 @@
 (function () {
   const detectApiBaseUrl = () => {
-    // Check for explicit configuration first
-    if (window.ADMIN_API_BASE_URL) {
-      return window.ADMIN_API_BASE_URL.replace(/\/$/, '');
-    }
-    if (window.ARARAT_API_BASE_URL) {
-      return window.ARARAT_API_BASE_URL.replace(/\/$/, '');
+    // Prefer the central config getter if available
+    if (window.getAraratApiBaseUrl) {
+      return window.getAraratApiBaseUrl();
     }
 
-    // If running on localhost/127.0.0.1 with a development server port (like 5500, 3000, etc.)
-    // default to backend port 8000
+    // Backwards-compatible checks
+    if (window.ARARAT_API_BASE_URL) return window.ARARAT_API_BASE_URL.replace(/\/$/, '');
+    if (window.ADMIN_API_BASE_URL) return window.ADMIN_API_BASE_URL.replace(/\/$/, '');
+
+    // Last-resort fallback: local development uses port 800, otherwise production host
     const hostname = window.location.hostname;
-    const port = window.location.port;
-    
-    if ((hostname === 'localhost' || hostname === '127.0.0.1') && port && port !== '8000') {
-      // Development mode - use backend port 8000
-      return `http://${hostname}:8000/api/v1`;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return `http://${hostname}:800/api/v1`;
     }
 
-    // Production API URL
-    return 'https://api.araratdesigns.org/api/v1';
+    // Prefer central getter or globals; keep a last-resort localhost fallback only
+    return (window.getAraratApiBaseUrl && window.getAraratApiBaseUrl()) || window.ARARAT_API_BASE_URL || window.ADMIN_API_BASE_URL || `http://${hostname}:800/api/v1`;
   };
 
   const API_BASE_URL = detectApiBaseUrl();
