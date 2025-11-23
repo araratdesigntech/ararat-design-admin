@@ -16,7 +16,7 @@ class AdminAuth {
             // Last-resort fallback
             const hostname = window.location.hostname;
             if (hostname === 'localhost' || hostname === '127.0.0.1') {
-                return `http://${hostname}:800/api/v1`;
+                return `http://${hostname}:8000/api/v1`;
             }
 
             // For production, use production API URL (should be set by config.js, but fallback if not)

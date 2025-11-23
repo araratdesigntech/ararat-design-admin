@@ -1,7 +1,7 @@
 // Central API base URL configuration
 // Sets a global variable `ARARAT_API_BASE_URL` (and ADMIN_API_BASE_URL for compatibility)
 // Behavior:
-// - On development (localhost/127.0.0.1 or private LAN) -> http://localhost:800/api/v1
+// - On development (localhost/127.0.0.1 or private LAN) -> http://localhost:8000/api/v1
 // - On production -> https://api.araratdesigns.org/api/v1
 (function (window) {
   try {
@@ -16,7 +16,7 @@
       window.ARARAT_API_BASE_URL = existing;
       window.ADMIN_API_BASE_URL = existing; // keep compatibility
     } else if (isLocalHost) {
-      window.ARARAT_API_BASE_URL = 'http://localhost:800/api/v1';
+      window.ARARAT_API_BASE_URL = 'http://localhost:8000/api/v1';
       window.ADMIN_API_BASE_URL = window.ARARAT_API_BASE_URL;
     } else {
       window.ARARAT_API_BASE_URL = 'https://api.araratdesigns.org/api/v1';

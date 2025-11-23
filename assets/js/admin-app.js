@@ -9,10 +9,10 @@
     if (window.ARARAT_API_BASE_URL) return window.ARARAT_API_BASE_URL.replace(/\/$/, '');
     if (window.ADMIN_API_BASE_URL) return window.ADMIN_API_BASE_URL.replace(/\/$/, '');
 
-    // Last-resort fallback: local development uses port 800, otherwise production host
+    // Last-resort fallback: local development uses port 8000, otherwise production host
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return `http://${hostname}:800/api/v1`;
+      return `http://${hostname}:8000/api/v1`;
     }
 
     // For production, use production API URL (should be set by config.js, but fallback if not)
