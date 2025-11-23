@@ -82,11 +82,15 @@ class ProductManager {
 
       const data = await productAPI.getProducts(params);
 
-      if (data.success) {
-        this.renderProducts(data.data.products);
+      console.log('Products API response:', data); // Debug log
+
+      if (data.success && data.data) {
+        const products = data.data.products || data.data.results || [];
+        this.renderProducts(products);
         this.renderPagination(data.data);
       } else {
-        this.showError("Failed to load products");
+        console.error('API returned error:', data);
+        this.showError(data.message || "Failed to load products");
       }
 
       this.hideLoading();
@@ -107,7 +111,7 @@ class ProductManager {
     if (!products || products.length === 0) {
       tbody.append(`
                   <tr>
-                      <td colspan="3" class="text-center">
+                      <td colspan="6" class="text-center">
                           <p class="text-muted">No products found</p>
                       </td>
                   </tr>
@@ -116,30 +120,52 @@ class ProductManager {
     }
 
     products.forEach((product) => {
+      // Safely get product image
+      let productImageUrl = "assets/images/digital-product/graphic-design.png";
+      if (product.productImages && Array.isArray(product.productImages) && product.productImages.length > 0) {
+        const firstImage = product.productImages[0];
+        if (firstImage && firstImage.url) {
+          productImageUrl = firstImage.url;
+        }
+      } else if (product.productImage) {
+        // Fallback to productImage if productImages is not available
+        productImageUrl = product.productImage;
+      }
+
+      // Safely get category name
+      let categoryName = "N/A";
+      if (product.category) {
+        if (typeof product.category === 'string') {
+          categoryName = product.category;
+        } else if (product.category.name) {
+          categoryName = product.category.name;
+        }
+      }
+
+      // Safely format price
+      const price = product.price ? (typeof product.price === 'number' ? product.price.toFixed(2) : product.price) : "0.00";
+
       const row = `
 
         <tr>
                             <td>
                               <img 
-                                  src="${
-                                    product.productImages[0].url ||
-                                    "assets/images/digital-product/graphic-design.png"
-                                  }" 
-                                  alt="${product.name}"
+                                  src="${productImageUrl}" 
+                                  alt="${product.name || 'Product'}"
                                   class="product-image"
                                   style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;"
                               />
                             </td>
 
-                            <td data-field="name">${product.name}</td>
+                            <td data-field="name">${product.name || 'N/A'}</td>
 
-                            <td data-field="price">${product.price}</td>
+                            <td data-field="price">₦${price}</td>
 
                             <td class="order-success" data-field="status">
                               <span>Success</span>
                             </td>
 
-                            <td data-field="name">${product.category.name}</td>
+                            <td data-field="category">${categoryName}</td>
 
                             <td>
                               <a href="product-detail.html?productId=${
@@ -152,7 +178,7 @@ class ProductManager {
                                 product._id
                               }" 
                                 class="btn-edit-product" 
-                                data-id=""
+                                data-id="${product._id}"
                                 title="Edit">
                                 <i class="fa fa-edit me-2" style="color: #007bff;"></i>
                               </a>
@@ -160,7 +186,7 @@ class ProductManager {
                               <a href="javascript:void(0)" 
                                 class="btn-delete-product" 
                                 data-id="${product._id}"
-                                data-name="${product.name}"
+                                data-name="${product.name || 'Product'}"
                                 title="Delete">
                                 <i class="fa fa-trash" style="color: #dc3545;"></i>
                               </a>
@@ -382,7 +408,7 @@ class ProductManager {
   showLoading() {
     $("#productTable tbody").html(`
               <tr>
-                  <td colspan="3" class="text-center">
+                  <td colspan="6" class="text-center">
                       <div class="spinner-border text-primary" role="status">
                           <span class="sr-only">Loading...</span>
                       </div>
