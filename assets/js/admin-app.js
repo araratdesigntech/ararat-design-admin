@@ -15,8 +15,8 @@
       return `http://${hostname}:800/api/v1`;
     }
 
-    // Prefer central getter or globals; keep a last-resort localhost fallback only
-    return (window.getAraratApiBaseUrl && window.getAraratApiBaseUrl()) || window.ARARAT_API_BASE_URL || window.ADMIN_API_BASE_URL || `http://${hostname}:800/api/v1`;
+    // For production, use production API URL (should be set by config.js, but fallback if not)
+    return 'https://api.araratdesigns.org/api/v1';
   };
 
   const API_BASE_URL = detectApiBaseUrl();
