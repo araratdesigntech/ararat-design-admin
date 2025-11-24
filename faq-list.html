@@ -357,8 +357,8 @@
                 <div class="col-lg-6">
                   <div class="page-header-left">
                     <h3>
-                      Category
-                      <small>View and Manage yout categories here</small>
+                      FAQ
+                      <small>View and Manage FAQs here</small>
                     </h3>
                   </div>
                 </div>
@@ -370,7 +370,7 @@
                       </a>
                     </li>
 
-                    <li class="breadcrumb-item active">Category</li>
+                    <li class="breadcrumb-item active">FAQ</li>
                   </ol>
                 </div>
               </div>
@@ -387,10 +387,10 @@
                     <div class="col-md-6">
                       <div class="search-form">
                         <input
-                          id="categorySearch"
+                          id="faqSearch"
                           class="form-control"
                           type="search"
-                          placeholder="Search categories..."
+                          placeholder="Search FAQs..."
                         />
                       </div>
                     </div>
@@ -399,10 +399,10 @@
                         type="button"
                         class="btn btn-primary d-flex align-items-center"
                         data-bs-toggle="modal"
-                        data-bs-target="#addCategoryModal"
+                        data-bs-target="#addFAQModal"
                       >
                         <i data-feather="plus-circle" class="me-1"></i>
-                        Add Category
+                        Add FAQ
                       </button>
                     </div>
                   </div>
@@ -411,20 +411,21 @@
                     <div class="table-responsive table-desi">
                       <table
                         class="table all-package table-category"
-                        id="categoryTable"
+                        id="faqTable"
                       >
                         <thead>
                           <tr>
-                            <th style="width: 100px">Image</th>
-                            <th>Name</th>
-                            <th>Description</th>
+                            <th>Question</th>
+                            <th>Answer</th>
+                            <th>Category</th>
+                            <th>Status</th>
                             <th style="width: 150px">Actions</th>
                           </tr>
                         </thead>
 
                         <tbody>
                           <tr>
-                            <td colspan="3" class="text-center">
+                            <td colspan="5" class="text-center">
                               <div
                                 class="spinner-border text-primary"
                                 role="status"
@@ -438,8 +439,7 @@
                     </div>
                   </div>
 
-                  <!-- Pagination -->
-                  <div id="categoryPagination" class="card-footer"></div>
+                  <!-- Pagination removed for FAQs -->
                 </div>
               </div>
             </div>
@@ -469,12 +469,12 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="addFAQModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title f-w-600" id="modalTitle">
-              Add New Category
+              Add New FAQ
             </h5>
             <button
               class="btn-close"
@@ -486,55 +486,83 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id="categoryForm" enctype="multipart/form-data">
+            <form id="faqForm">
               <div class="form-group mb-3">
-                <label for="categoryName" class="mb-1">Category Name</label>
+                <label for="faqQuestion" class="mb-1">Question <span class="text-danger">*</span></label>
                 <input
                   class="form-control"
-                  id="categoryName"
-                  name="name"
+                  id="faqQuestion"
+                  name="question"
                   type="text"
                   required
-                  placeholder="Enter category name"
+                  minlength="10"
+                  placeholder="Enter FAQ question"
                 />
+                <small class="text-muted">Minimum 10 characters</small>
               </div>
 
               <div class="form-group mb-3">
-                <label for="categoryDescription" class="mb-1"
-                  >Description</label
-                >
+                <label for="faqAnswer" class="mb-1">Answer <span class="text-danger">*</span></label>
                 <textarea
                   class="form-control"
-                  id="categoryDescription"
-                  name="description"
-                  rows="3"
-                  placeholder="Enter category description"
+                  id="faqAnswer"
+                  name="answer"
+                  rows="5"
+                  required
+                  minlength="10"
+                  placeholder="Enter FAQ answer"
                 ></textarea>
+                <small class="text-muted">Minimum 10 characters</small>
               </div>
 
               <div class="form-group mb-3">
-                <label for="categoryImage" class="mb-1">Category Image</label>
+                <label for="faqCategory" class="mb-1">Category</label>
                 <input
                   class="form-control"
-                  id="categoryImage"
-                  name="image"
-                  type="file"
-                  accept="image/*"
+                  id="faqCategory"
+                  name="category"
+                  type="text"
+                  placeholder="Enter category (optional)"
                 />
-                <small class="text-muted"
-                  >Upload an image for the category</small
-                >
-                <div
-                  id="currentCategoryImage"
-                  class="mt-2"
-                  style="display: none"
-                ></div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label for="faqOrder" class="mb-1">Order</label>
+                    <input
+                      class="form-control"
+                      id="faqOrder"
+                      name="order"
+                      type="number"
+                      value="0"
+                      min="0"
+                      placeholder="Display order"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <div class="form-check mt-4">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="faqIsActive"
+                        name="isActive"
+                        checked
+                      />
+                      <label class="form-check-label" for="faqIsActive">
+                        Active
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
           <div class="modal-footer">
             <button
-              id="cancelCategoryModalBtn"
+              id="cancelFAQModalBtn"
               class="btn btn-secondary"
               type="button"
               data-bs-dismiss="modal"
@@ -542,12 +570,12 @@
               Cancel
             </button>
             <button
-              id="categorySubmit"
+              id="faqSubmit"
               class="btn btn-primary"
               type="submit"
-              form="categoryForm"
+              form="faqForm"
             >
-              Add Category
+              Save FAQ
             </button>
           </div>
         </div>
@@ -585,11 +613,14 @@
     <script src="assets/js/config.js"></script>
     <script src="assets/js/auth.js"></script>
 
-  <!-- Category API -->
-  <script src="assets/js/categories-api.js"></script>
+    <!-- Admin App (must load before API services for token refresh) -->
+    <script src="assets/js/admin-app.js"></script>
 
-    <!-- Category Manager -->
-    <script src="assets/js/categories-manager.js"></script>
+  <!-- FAQ API -->
+  <script src="assets/js/faq-api.js"></script>
+
+    <!-- FAQ Manager -->
+    <script src="assets/js/faq-manager.js"></script>
 
     <!--script admin-->
     <script src="assets/js/admin-script.js"></script>
@@ -610,3 +641,4 @@
     </script>
   </body>
 </html>
+

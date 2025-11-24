@@ -31,6 +31,14 @@
   let salesByLocationChart = null;
   let ordersByStatusChart = null;
   let topProductsChart = null;
+  
+  // Store chart data for resize redraws
+  let chartDataCache = {
+    locations: null,
+    statuses: null,
+    trends: null,
+    products: null
+  };
 
   const statTargets = {
     orders: document.getElementById('dashboardTotalOrders'),
@@ -41,6 +49,7 @@
 
   const recentOrdersContainer = document.getElementById('recentOrdersBody');
   const salesLocationList = document.getElementById('salesLocationList');
+  const ordersStatusList = document.getElementById('ordersStatusList');
 
   const setStat = (key, value) => {
     if (statTargets[key]) {
@@ -139,32 +148,62 @@
 
       // Get container dimensions for proper sizing
       const container = canvas.parentElement;
+      let chartSize = 200; // Default size
+      
       if (container) {
         // Calculate available space (account for padding)
         const containerRect = container.getBoundingClientRect();
-        const containerWidth = containerRect.width - 20; // Account for padding
-        const containerHeight = containerRect.height - 20;
-        // Use square dimensions for doughnut chart (use smaller dimension)
-        const chartSize = Math.min(containerWidth, containerHeight, 140); // Max 140px
+        const containerWidth = containerRect.width - 40; // Account for padding
+        const containerHeight = containerRect.height - 40;
         
-        // Set canvas dimensions explicitly (square for doughnut)
-        canvas.width = chartSize;
-        canvas.height = chartSize;
-        canvas.style.width = chartSize + 'px';
-        canvas.style.height = chartSize + 'px';
-        canvas.style.maxWidth = '100%';
-        canvas.style.maxHeight = '100%';
+        // Responsive chart sizing based on screen width
+        let maxChartSize;
+        const screenWidth = window.innerWidth;
+        
+        if (screenWidth < 768) {
+          // Mobile: smaller charts
+          maxChartSize = Math.min(containerWidth, containerHeight, 200);
+        } else if (screenWidth < 1024) {
+          // Tablet: medium charts
+          maxChartSize = Math.min(containerWidth, containerHeight, 220);
+        } else {
+          // Desktop: larger charts
+          maxChartSize = Math.min(containerWidth, containerHeight, 240);
+        }
+        
+        // Ensure minimum size and use the smaller dimension to keep it square
+        chartSize = Math.max(Math.min(maxChartSize, containerWidth, containerHeight), 180);
+        
+        // Ensure container has enough height
+        if (containerHeight < chartSize + 20) {
+          container.style.minHeight = (chartSize + 40) + 'px';
+        }
         
         console.log('[Dashboard] Location chart container:', {
           width: containerRect.width,
           height: containerRect.height,
-          chartSize: chartSize
+          availableWidth: containerWidth,
+          availableHeight: containerHeight,
+          chartSize: chartSize,
+          screenWidth: screenWidth
         });
       }
+      
+      // Set canvas dimensions explicitly BEFORE creating chart (square for doughnut)
+      // This is critical - Chart.js needs the canvas to be properly sized
+      canvas.width = chartSize;
+      canvas.height = chartSize;
+      canvas.style.width = chartSize + 'px';
+      canvas.style.height = chartSize + 'px';
+      canvas.style.maxWidth = '100%';
+      canvas.style.maxHeight = '100%';
+      canvas.style.display = 'block';
+      canvas.style.margin = '0 auto';
+      canvas.style.verticalAlign = 'middle';
 
       salesByLocationChart = new Chart(ctx).Doughnut(pieData, {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: false, // Disable responsive to use our explicit sizing
+        maintainAspectRatio: true, // Maintain aspect ratio for proper circle
         segmentShowStroke: true,
         segmentStrokeColor: '#fff',
         segmentStrokeWidth: 2,
@@ -187,15 +226,13 @@
       console.error('Canvas element:', canvas);
     }
 
-    // Render location list
-    const colorClasses = ['order-shape-primary', 'order-shape-secondary', 'order-shape-danger', 
-                          'order-shape-warning', 'order-shape-success'];
-    
+    // Render location list with colors matching the chart
+    // Use the same color array as the chart to ensure perfect matching
     salesLocationList.innerHTML = locations.map((loc, index) => {
-      const colorClass = colorClasses[index % colorClasses.length];
+      const chartColor = colors[index % colors.length];
       return `
         <div class="media">
-          <div class="${colorClass}"></div>
+          <div class="order-shape-indicator" style="background-color: ${chartColor}; width: 18px; height: 8px; margin-top: 7px; border-radius: 4px; display: inline-block;"></div>
           <div class="media-body">
             <h6 class="mb-0 me-0">
               ${loc.location} <span class="pull-right">${loc.percentage}%</span>
@@ -258,32 +295,62 @@
 
       // Get container dimensions for proper sizing
       const statusContainer = canvas.parentElement;
+      let statusChartSize = 200; // Default size
+      
       if (statusContainer) {
-        // Calculate available space (account for padding and title)
+        // Calculate available space (account for padding)
         const statusContainerRect = statusContainer.getBoundingClientRect();
-        const statusContainerWidth = statusContainerRect.width - 20; // Account for padding
-        const statusContainerHeight = statusContainerRect.height - 30; // Account for title + padding
-        // Use square dimensions for doughnut chart (use smaller dimension)
-        const statusChartSize = Math.min(statusContainerWidth, statusContainerHeight, 140); // Max 140px
+        const statusContainerWidth = statusContainerRect.width - 40; // Account for padding
+        const statusContainerHeight = statusContainerRect.height - 40; // Account for padding
         
-        // Set canvas dimensions explicitly (square for doughnut)
-        canvas.width = statusChartSize;
-        canvas.height = statusChartSize;
-        canvas.style.width = statusChartSize + 'px';
-        canvas.style.height = statusChartSize + 'px';
-        canvas.style.maxWidth = '100%';
-        canvas.style.maxHeight = '100%';
+        // Responsive chart sizing based on screen width
+        let maxChartSize;
+        const screenWidth = window.innerWidth;
+        
+        if (screenWidth < 768) {
+          // Mobile: smaller charts
+          maxChartSize = Math.min(statusContainerWidth, statusContainerHeight, 200);
+        } else if (screenWidth < 1024) {
+          // Tablet: medium charts
+          maxChartSize = Math.min(statusContainerWidth, statusContainerHeight, 220);
+        } else {
+          // Desktop: larger charts
+          maxChartSize = Math.min(statusContainerWidth, statusContainerHeight, 240);
+        }
+        
+        // Ensure minimum size and use the smaller dimension to keep it square
+        statusChartSize = Math.max(Math.min(maxChartSize, statusContainerWidth, statusContainerHeight), 180);
+        
+        // Ensure container has enough height
+        if (statusContainerHeight < statusChartSize + 20) {
+          statusContainer.style.minHeight = (statusChartSize + 40) + 'px';
+        }
         
         console.log('[Dashboard] Status chart container:', {
           width: statusContainerRect.width,
           height: statusContainerRect.height,
-          chartSize: statusChartSize
+          availableWidth: statusContainerWidth,
+          availableHeight: statusContainerHeight,
+          chartSize: statusChartSize,
+          screenWidth: screenWidth
         });
       }
+      
+      // Set canvas dimensions explicitly BEFORE creating chart (square for doughnut)
+      // This is critical - Chart.js needs the canvas to be properly sized
+      canvas.width = statusChartSize;
+      canvas.height = statusChartSize;
+      canvas.style.width = statusChartSize + 'px';
+      canvas.style.height = statusChartSize + 'px';
+      canvas.style.maxWidth = '100%';
+      canvas.style.maxHeight = '100%';
+      canvas.style.display = 'block';
+      canvas.style.margin = '0 auto';
+      canvas.style.verticalAlign = 'middle';
 
       ordersByStatusChart = new Chart(ctx).Doughnut(pieData, {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: false, // Disable responsive to use our explicit sizing
+        maintainAspectRatio: true, // Maintain aspect ratio for proper circle
         segmentShowStroke: true,
         segmentStrokeColor: '#fff',
         segmentStrokeWidth: 2,
@@ -298,15 +365,64 @@
       console.log('[Dashboard] Status chart sized to:', statusChartSize + 'x' + statusChartSize);
       
       console.log('[Dashboard] Orders by status chart rendered successfully', ordersByStatusChart);
+      
+      // Render status list
+      if (!ordersStatusList || !statuses.length) {
+        if (ordersStatusList) {
+          ordersStatusList.innerHTML = '<div class="text-center py-3 text-muted">No status data available.</div>';
+        }
+        return;
+      }
+      
+      const statusColors = {
+        'pending': 'order-shape-warning',
+        'awaiting_payment': 'order-shape-warning',
+        'processing': 'order-shape-primary',
+        'delivered': 'order-shape-success',
+        'cancelled': 'order-shape-danger',
+        'shipped': 'order-shape-secondary'
+      };
+      
+      // Calculate total orders for percentage calculation
+      const totalOrders = statuses.reduce((sum, s) => sum + (s.count || 0), 0);
+      
+      ordersStatusList.innerHTML = statuses.map((status) => {
+        const colorClass = statusColors[status.status] || 'order-shape-primary';
+        const percentage = totalOrders > 0 ? Math.round((status.count / totalOrders) * 100) : 0;
+        const statusLabel = status.label || status.status || 'Unknown';
+        
+        return `
+          <div class="media">
+            <div class="${colorClass}"></div>
+            <div class="media-body">
+              <h6 class="mb-0 me-0">
+                ${statusLabel} <span class="pull-right">${status.count || 0} (${percentage}%)</span>
+              </h6>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
     } catch (error) {
       console.error('Error creating orders by status chart:', error);
       console.error('Error stack:', error.stack);
       console.error('Status data:', statuses);
+      
+      // Show error message in status list
+      if (ordersStatusList) {
+        ordersStatusList.innerHTML = '<div class="text-center py-3 text-danger">Error loading status data.</div>';
+      }
     }
   };
 
   // Render revenue trends chart (using Chart.js v2 API)
   const renderRevenueTrends = (trends = [], period = 'monthly') => {
+    // Hide loading and empty states
+    const loadingEl = document.getElementById('revenueTrendsLoading');
+    const emptyEl = document.getElementById('revenueTrendsEmpty');
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'none';
+    
     if (revenueTrendsChart) {
       try {
         revenueTrendsChart.destroy();
@@ -317,10 +433,21 @@
     }
 
     const canvas = document.getElementById('revenueTrendsChart');
-    if (!canvas || !trends.length || typeof Chart === 'undefined') {
-      console.warn('Cannot render revenue trends: canvas missing, no trends, or Chart.js not loaded');
+    if (!canvas || typeof Chart === 'undefined') {
+      console.warn('Cannot render revenue trends: canvas missing or Chart.js not loaded');
+      if (emptyEl) emptyEl.style.display = 'block';
       return;
     }
+    
+    if (!trends.length) {
+      console.warn('No trend data available');
+      canvas.style.display = 'none';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+    
+    // Show canvas
+    canvas.style.display = 'block';
 
     // Check if canvas is visible
     const canvasStyle = window.getComputedStyle(canvas);
@@ -340,6 +467,29 @@
       const labels = trends.map(t => t.label);
       const revenues = trends.map(t => t.revenue || 0);
       const orders = trends.map(t => t.orders || 0);
+
+      // Get container dimensions for proper sizing
+      const container = canvas.parentElement;
+      if (container) {
+        const containerRect = container.getBoundingClientRect();
+        const containerWidth = containerRect.width - 40; // Account for padding
+        const containerHeight = 300; // Use fixed height from CSS
+        
+        // Set canvas dimensions
+        canvas.width = containerWidth;
+        canvas.height = containerHeight;
+        canvas.style.width = containerWidth + 'px';
+        canvas.style.height = containerHeight + 'px';
+        canvas.style.maxWidth = '100%';
+        canvas.style.display = 'block';
+        
+        console.log('[Dashboard] Revenue trends chart container:', {
+          width: containerRect.width,
+          height: containerRect.height,
+          canvasWidth: containerWidth,
+          canvasHeight: containerHeight
+        });
+      }
 
       const lineData = {
         labels: labels,
@@ -370,7 +520,10 @@
       console.log('[Dashboard] Creating revenue trends chart with data:', {
         labels: labels.length,
         revenues: revenues.length,
-        orders: orders.length
+        orders: orders.length,
+        sampleLabels: labels.slice(0, 3),
+        sampleRevenues: revenues.slice(0, 3),
+        sampleOrders: orders.slice(0, 3)
       });
 
       revenueTrendsChart = new Chart(ctx).Line(lineData, {
@@ -485,7 +638,13 @@
       return;
     }
     
-    console.log('[Dashboard] Starting to load dashboard data...');
+      console.log('[Dashboard] Starting to load dashboard data...');
+    
+    // Show loading state for revenue trends
+    const revenueLoading = document.getElementById('revenueTrendsLoading');
+    const revenueCanvas = document.getElementById('revenueTrendsChart');
+    if (revenueLoading) revenueLoading.style.display = 'block';
+    if (revenueCanvas) revenueCanvas.style.display = 'none';
     
     try {
       // Load dashboard stats
@@ -562,18 +721,36 @@
       // Render charts one by one with error handling
       try {
         const trends = revenueTrendsResponse?.data?.trends || [];
+        chartDataCache.trends = trends; // Cache for resize
         console.log('[Dashboard] Rendering revenue trends:', trends.length, 'data points', trends);
-        if (canvases.revenueTrends && trends.length > 0) {
-          renderRevenueTrends(trends, revenueTrendsResponse?.data?.period || 'monthly');
+        console.log('[Dashboard] Revenue trends response:', revenueTrendsResponse);
+        
+        if (canvases.revenueTrends) {
+          if (trends.length > 0) {
+            renderRevenueTrends(trends, revenueTrendsResponse?.data?.period || 'monthly');
+          } else {
+            console.warn('[Dashboard] No trend data available, showing empty state');
+            // Show empty state message
+            const container = canvases.revenueTrends.parentElement;
+            if (container) {
+              container.innerHTML = '<div class="text-center py-5 text-muted"><p>No revenue trend data available</p><p class="small">Data will appear here once orders are placed</p></div>';
+            }
+          }
         } else {
-          console.warn('[Dashboard] Skipping revenue trends chart - no data or canvas missing');
+          console.warn('[Dashboard] Revenue trends canvas missing');
         }
       } catch (error) {
         console.error('[Dashboard] Error rendering revenue trends:', error);
+        // Show error message in chart container
+        const canvas = document.getElementById('revenueTrendsChart');
+        if (canvas && canvas.parentElement) {
+          canvas.parentElement.innerHTML = '<div class="text-center py-5 text-danger"><p>Error loading revenue trends</p><p class="small">Please refresh the page</p></div>';
+        }
       }
 
       try {
         const locations = locationResponse?.data?.locations || [];
+        chartDataCache.locations = locations; // Cache for resize
         console.log('[Dashboard] Rendering sales by location:', locations.length, 'locations', locations);
         if (canvases.salesByLocation && locations.length > 0) {
           renderSalesByLocation(locations);
@@ -586,6 +763,7 @@
 
       try {
         const statuses = statusResponse?.data?.statuses || [];
+        chartDataCache.statuses = statuses; // Cache for resize
         console.log('[Dashboard] Rendering orders by status:', statuses.length, 'statuses', statuses);
         if (canvases.ordersByStatus && statuses.length > 0) {
           renderOrdersByStatus(statuses);
@@ -663,6 +841,22 @@
       });
     }
   };
+
+  // Handle window resize to redraw charts responsively
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      console.log('[Dashboard] Window resized, redrawing charts...');
+      // Redraw charts with cached data
+      if (chartDataCache.locations) {
+        renderSalesByLocation(chartDataCache.locations);
+      }
+      if (chartDataCache.statuses) {
+        renderOrdersByStatus(chartDataCache.statuses);
+      }
+    }, 250); // Debounce resize events
+  });
 
   // Start initialization
   init();

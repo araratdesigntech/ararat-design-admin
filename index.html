@@ -87,7 +87,7 @@
         max-width: 100%;
         height: auto !important;
       }
-      
+
       /* Doughnut charts need to fit within their containers */
       #salesByLocationChart,
       #ordersByStatusChart {
@@ -95,27 +95,176 @@
         max-height: 100% !important;
         width: 100% !important;
         height: auto !important;
+        display: block;
+        margin: 0 auto;
       }
-      
+
       /* Container height for charts */
       .chart-container {
         position: relative;
         height: 300px;
       }
+      
+      /* Responsive chart container for small charts */
       .chart-container-sm {
         position: relative;
-        min-height: 180px;
-        max-height: 200px;
+        min-height: 260px;
+        height: auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
+        padding: 20px;
+        overflow: visible;
       }
+      
+      /* Responsive adjustments for Sales Status section */
+      .order-graph {
+        padding: 15px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .order-graph h6 {
+        margin-bottom: 15px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      
+      .order-graph-bottom {
+        margin-top: 15px;
+        padding-top: 15px;
+      }
+      
+      .peity-chart-dashboard {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 240px;
+        width: 100%;
+        overflow: visible;
+      }
+      
+      /* Equal height for Market Value and Latest Orders cards */
+      .dashboard-row-equal-height {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      
+      .dashboard-row-equal-height > .col-xl-6 {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .dashboard-row-equal-height > .col-xl-6 > .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        flex: 1;
+      }
+      
+      .dashboard-row-equal-height > .col-xl-6 > .card > .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      
+      .dashboard-row-equal-height .chart-container {
+        flex: 1;
+        min-height: 300px;
+      }
+      
+      .dashboard-row-equal-height .latest-order-table {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      
+      .dashboard-row-equal-height .latest-order-table .table {
+        flex: 1;
+        margin-bottom: 0;
+      }
+      
+      .dashboard-row-equal-height .latest-order-table .btn {
+        margin-top: auto;
+        align-self: flex-start;
+      }
+      
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        .chart-container-sm {
+          min-height: 280px;
+          padding: 15px;
+        }
+        
+        .order-graph {
+          padding: 10px;
+          margin-bottom: 20px;
+        }
+        
+        .peity-chart-dashboard {
+          min-height: 260px;
+        }
+        
+        #salesByLocationChart,
+        #ordersByStatusChart {
+          max-width: 200px;
+          max-height: 200px;
+          width: 200px !important;
+          height: 200px !important;
+        }
+      }
+      
+      /* Tablet responsive */
+      @media (min-width: 769px) and (max-width: 1024px) {
+        .chart-container-sm {
+          min-height: 260px;
+        }
+        
+        #salesByLocationChart,
+        #ordersByStatusChart {
+          max-width: 220px;
+          max-height: 220px;
+          width: 220px !important;
+          height: 220px !important;
+        }
+      }
+      
+      /* Desktop */
+      @media (min-width: 1025px) {
+        .chart-container-sm {
+          min-height: 280px;
+        }
+        
+        #salesByLocationChart,
+        #ordersByStatusChart {
+          max-width: 240px;
+          max-height: 240px;
+          width: 240px !important;
+          height: 240px !important;
+        }
+      }
+      
       .chart-container-lg {
         position: relative;
         height: 400px;
       }
       
+      /* Ensure Sales Status card body has proper spacing */
+      #salesStatusCard .card-body {
+        padding: 20px;
+      }
+      
+      /* Fix column spacing on mobile */
+      @media (max-width: 768px) {
+        .col-xl-6 {
+          margin-bottom: 20px;
+        }
+      }
+
       /* Peity chart dashboard container for location chart */
       .peity-chart-dashboard {
         position: relative !important;
@@ -129,14 +278,14 @@
         padding: 10px !important;
         box-sizing: border-box !important;
       }
-      
+
       .peity-chart-dashboard canvas {
         max-width: 140px !important;
         max-height: 140px !important;
         width: 140px !important;
         height: 140px !important;
       }
-      
+
       /* Order graph container for status chart */
       .order-graph.xl-space {
         position: relative !important;
@@ -151,13 +300,13 @@
         padding: 5px 10px !important;
         box-sizing: border-box !important;
       }
-      
+
       .order-graph.xl-space h6 {
         margin-bottom: 5px !important;
         font-size: 14px !important;
         flex-shrink: 0 !important;
       }
-      
+
       .order-graph.xl-space canvas {
         max-width: 140px !important;
         max-height: 140px !important;
@@ -327,7 +476,11 @@
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0)" id="logoutButton" data-admin-logout>
+                    <a
+                      href="javascript:void(0)"
+                      id="logoutButton"
+                      data-admin-logout
+                    >
                       <i data-feather="log-out"></i>Logout
                     </a>
                   </li>
@@ -438,6 +591,26 @@
                   ><i data-feather="settings"></i><span>Profile</span>
                 </a>
               </li>
+
+              <li>
+                <a class="sidebar-header" href="javascript:void(0)">
+                  <i data-feather="help-circle"></i>
+                  <span>Content</span>
+                  <i class="fa fa-angle-right pull-right"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                  <li>
+                    <a href="faq-list.html">
+                      <i class="fa fa-circle"></i>FAQ
+                    </a>
+                  </li>
+                  <li>
+                    <a href="contact-list.html">
+                      <i class="fa fa-circle"></i>Contact
+                    </a>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </div>
         </div>
@@ -545,6 +718,8 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="row dashboard-row-equal-height">
               <div class="col-xl-6 xl-100">
                 <div class="card">
                   <div class="card-header">
@@ -570,7 +745,11 @@
                   </div>
                   <div class="card-body">
                     <div class="d-flex justify-content-end mb-3">
-                      <select id="revenueTrendPeriod" class="form-select form-select-sm" style="width: auto;">
+                      <select
+                        id="revenueTrendPeriod"
+                        class="form-select form-select-sm"
+                        style="width: auto"
+                      >
                         <option value="daily">Last 30 Days</option>
                         <option value="weekly">Last 12 Weeks</option>
                         <option value="monthly" selected>Last 12 Months</option>
@@ -578,6 +757,16 @@
                     </div>
                     <div class="chart-container">
                       <canvas id="revenueTrendsChart"></canvas>
+                      <div id="revenueTrendsLoading" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading revenue trends...</p>
+                      </div>
+                      <div id="revenueTrendsEmpty" class="text-center py-5 text-muted" style="display: none;">
+                        <p>No revenue trend data available</p>
+                        <p class="small">Data will appear here once orders are placed</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -620,7 +809,9 @@
                         </thead>
                         <tbody id="recentOrdersBody">
                           <tr>
-                            <td colspan="4" class="text-center py-3">Loading recent orders...</td>
+                            <td colspan="4" class="text-center py-3">
+                              Loading recent orders...
+                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -631,142 +822,11 @@
                   </div>
                 </div>
               </div>
-              <div class="col-xl-4 col-md-6 xl-50">
-                <div class="card order-graph sales-carousel">
-                  <div class="card-header b-header">
-                    <h6>Total Orders</h6>
-                    <div class="row">
-                      <div class="col-6">
-                        <div class="small-chartjs">
-                          <div
-                            class="flot-chart-placeholder"
-                            id="simple-line-chart-sparkline-3"
-                          ></div>
-                        </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="value-graph">
-                          <h3>
-                            42%
-                            <span
-                              ><i class="fa fa-angle-up font-primary"></i
-                            ></span>
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="media">
-                      <div class="media-body">
-                        <span>Orders Last Month</span>
-                        <h2 class="mb-0">9054</h2>
-                        <p>
-                          0.25% <span><i class="fa fa-angle-up"></i></span>
-                        </p>
-                      </div>
-
-                      <div class="bg-primary">
-                        <div class="small-box">
-                          <i data-feather="briefcase"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xl-4 col-md-6 xl-50">
-                <div class="card order-graph sales-carousel">
-                  <div class="card-header b-header">
-                    <h6>Total purchase</h6>
-                    <div class="row">
-                      <div class="col-6">
-                        <div class="small-chartjs">
-                          <div
-                            class="flot-chart-placeholder"
-                            id="simple-line-chart-sparkline"
-                          ></div>
-                        </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="value-graph">
-                          <h3>
-                            20%
-                            <span
-                              ><i class="fa fa-angle-up font-secondary"></i
-                            ></span>
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="media">
-                      <div class="media-body">
-                        <span>Monthly purchase</span>
-                        <h2 class="mb-0">2154</h2>
-                        <p>
-                          0.13% <span><i class="fa fa-angle-up"></i></span>
-                        </p>
-                      </div>
-                      <div class="bg-secondary">
-                        <div class="small-box">
-                          <i data-feather="credit-card"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-xl-4 col-md-6 xl-50">
-                <div class="card order-graph sales-carousel">
-                  <div class="card-header b-header">
-                    <h6>Total Refunds</h6>
-                    <div class="row">
-                      <div class="col-6">
-                        <div class="small-chartjs">
-                          <div
-                            class="flot-chart-placeholder"
-                            id="simple-line-chart-sparkline-1"
-                          ></div>
-                        </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="value-graph">
-                          <h3>
-                            0.5%
-                            <span
-                              ><i class="fa fa-angle-up font-danger"></i
-                            ></span>
-                          </h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="media">
-                      <div class="media-body">
-                        <span>Refunds last mont</span>
-                        <h2 class="mb-0">0782</h2>
-                        <p>
-                          0.25% <span><i class="fa fa-angle-up"></i></span>
-                        </p>
-                      </div>
-                      <div class="bg-danger">
-                        <div class="small-box">
-                          <i data-feather="repeat"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               <!-- Buy / Sell chart removed as requested -->
-              
+
               <div class="col-sm-12">
-                <div class="card">
+                <div class="card" id="salesStatusCard">
                   <div class="card-header">
                     <h5>Sales Status</h5>
                     <div class="card-header-right">
@@ -789,27 +849,48 @@
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="row">
-                      <div class="col-xl-6 col-sm-6 xl-50">
+                    <div class="row g-3">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
                         <div class="order-graph sm-order-space">
                           <h6>Sales By Location</h6>
-                          <div class="peity-chart-dashboard text-center chart-container-sm">
+                          <div
+                            class="peity-chart-dashboard text-center chart-container-sm"
+                          >
                             <canvas id="salesByLocationChart"></canvas>
                           </div>
-                          <div class="order-graph-bottom sales-location" id="salesLocationList">
+                          <div
+                            class="order-graph-bottom sales-location"
+                            id="salesLocationList"
+                          >
                             <!-- Location data will be loaded dynamically -->
                             <div class="text-center py-3">
-                              <span class="spinner-border spinner-border-sm" role="status"></span>
+                              <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                              ></span>
                               <span class="ms-2">Loading location data...</span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div class="col-xl-6 xl-100">
-                        <div class="order-graph xl-space">
+                      <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
+                        <div class="order-graph sm-order-space">
                           <h6>Orders By Status</h6>
-                          <div class="chart-container-sm">
+                          <div class="peity-chart-dashboard text-center chart-container-sm">
                             <canvas id="ordersByStatusChart"></canvas>
+                          </div>
+                          <div
+                            class="order-graph-bottom"
+                            id="ordersStatusList"
+                          >
+                            <!-- Status data will be loaded dynamically -->
+                            <div class="text-center py-3">
+                              <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                              ></span>
+                              <span class="ms-2">Loading status data...</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -938,7 +1019,7 @@
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/admin-app.js"></script>
     <script src="assets/js/admin-dashboard-page.js"></script>
-    
+
     <!--script admin-->
     <script src="assets/js/admin-script.js"></script>
   </body>

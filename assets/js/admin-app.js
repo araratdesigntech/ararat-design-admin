@@ -132,51 +132,44 @@
 
         if (!response.ok || !data.success) {
           console.error('Token refresh failed:', data);
-          const pathname = window.location.pathname.toLowerCase();
-          const isPublicPage = pathname.includes('login.html') || 
-                               pathname.includes('forgot-password.html') || 
-                               pathname.includes('reset-password.html');
           
-          clearSession();
+          // Check if refresh token is also expired
+          const errorMessage = data?.message || data?.error || '';
+          const isRefreshTokenExpired = errorMessage.toLowerCase().includes('jwt expired') || 
+                                       errorMessage.toLowerCase().includes('token expired') ||
+                                       errorMessage.toLowerCase().includes('expired') ||
+                                       response.status === 401 || 
+                                       response.status === 403;
           
-          // Only redirect if not already on a public page
-          if (!isPublicPage) {
-            // Small delay to prevent immediate redirect during page load
-            setTimeout(() => {
-              if (!window.location.pathname.includes('login.html')) {
-                window.location.href = 'login.html';
-              }
-            }, 100);
+          if (isRefreshTokenExpired) {
+            // Refresh token is expired - logout user
+            console.log('Refresh token expired - logging out user');
+            clearSession();
+            return null;
           }
-          throw new Error(data?.message || 'Token refresh failed');
+          
+          // Other error - still logout for security
+          clearSession();
+          return null;
         }
 
         // Update session with new tokens
-        // Refresh token response structure: data.data.user.accessToken
-        if (!data.data?.user?.accessToken || !data.data?.user?.refreshToken) {
+        // Refresh token response structure: data.data.accessToken and data.data.refreshToken
+        // OR data.data.user.accessToken and data.data.user.refreshToken
+        const accessToken = data.data?.accessToken || data.data?.user?.accessToken;
+        const refreshToken = data.data?.refreshToken || data.data?.user?.refreshToken;
+        
+        if (!accessToken || !refreshToken) {
           console.error('Invalid refresh token response structure:', data);
-          const pathname = window.location.pathname.toLowerCase();
-          const isPublicPage = pathname.includes('login.html') || 
-                               pathname.includes('forgot-password.html') || 
-                               pathname.includes('reset-password.html');
-          
           clearSession();
-          
-          // Only redirect if not already on a public page
-          if (!isPublicPage) {
-            setTimeout(() => {
-              if (!window.location.pathname.includes('login.html')) {
-                window.location.href = 'login.html';
-              }
-            }, 100);
-          }
-          throw new Error('Invalid token refresh response');
+          return null;
         }
 
         const updatedSession = {
           ...session,
-          accessToken: data.data.user.accessToken,
-          refreshToken: data.data.user.refreshToken,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          loginTime: Date.now(), // Update login time
         };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedSession));
@@ -292,15 +285,22 @@
     }
     
     let result = await makeRequest(tokenToUse);
-
+    
+    // Check for JWT expiration in response
+    const responseData = result.data || {};
+    const errorMessage = responseData.message || responseData.error || '';
+    const isJwtExpired = errorMessage.toLowerCase().includes('jwt expired') || 
+                         errorMessage.toLowerCase().includes('token expired') ||
+                         errorMessage.toLowerCase().includes('expired');
+    
     // Only check HTTP status codes for auth errors, not response body status field
     // 403 is returned when JWT is invalid/expired (from backend checkIsAuth middleware)
     // 401 is returned for other auth failures
     const httpStatus = result.response.status;
-    const isAuthError = httpStatus === 401 || httpStatus === 403;
+    const isAuthError = httpStatus === 401 || httpStatus === 403 || isJwtExpired;
 
     // Only attempt refresh if:
-    // 1. It's an auth error (401 or 403)
+    // 1. It's an auth error (401, 403, or jwt expired message)
     // 2. retryOn401 is enabled
     // 3. We have a refresh token
     // 4. The request actually failed (not ok)
@@ -319,51 +319,83 @@
           throw new Error('Token refresh failed');
         }
       } catch (error) {
-        // Refresh failed - check if we're already on login page to avoid infinite loops
-        const pathname = window.location.pathname.toLowerCase();
-        const isPublicPage = pathname.includes('login.html') || 
-                             pathname.includes('forgot-password.html') || 
-                             pathname.includes('reset-password.html');
-        
-        if (!isPublicPage) {
-          showToast('Session expired, please login again.', 'warning');
-        }
-        throw new Error('Unauthorized');
+        // Refresh failed - user should be logged out
+        stopAllLoadingSpinners();
+        // clearSession() already handles redirect, so just throw to stop execution
+        throw new Error('Token refresh failed - session expired');
       }
     } else if (!result.response.ok && isAuthError && isTokenTooFresh) {
       // If token is too fresh but we got an auth error, the token might be invalid
       // Log this for debugging but don't attempt refresh (might be a different issue)
       console.warn('Auth error with fresh token - possible invalid token or session issue');
-    }
-
-    if (raw) return result.response;
-
-    // Handle final response - only check HTTP status codes
-    // But don't throw/logout if we just tried to refresh and the token is very fresh
-    if (result.response.status === 401 || result.response.status === 403) {
+    } else if (!result.response.ok && isAuthError && !session?.refreshToken) {
+      // No refresh token available - logout immediately
       const pathname = window.location.pathname.toLowerCase();
       const isPublicPage = pathname.includes('login.html') || 
                            pathname.includes('forgot-password.html') || 
                            pathname.includes('reset-password.html');
       
-      // Check if token is very fresh (just logged in) - might be a different issue
-      const tokenAge = session?.loginTime ? Date.now() - session.loginTime : Infinity;
-      const isTokenVeryFresh = tokenAge < 10000; // 10 seconds
-      
-      // If token is very fresh, don't immediately logout - might be a server issue or invalid request
-      if (!isPublicPage && !isTokenVeryFresh) {
+      if (!isPublicPage) {
+        stopAllLoadingSpinners();
         showToast('Session expired, please login again.', 'warning');
         clearSession();
-      } else if (!isPublicPage && isTokenVeryFresh) {
-        // Very fresh token with auth error - log for debugging but don't logout immediately
-        console.warn('Auth error with very fresh token (logged in < 10s ago). Possible server issue or invalid request.');
-        console.warn('Response:', result.response.status, result.data);
+      }
+      throw new Error('Unauthorized - no refresh token available');
+    }
+
+    if (raw) return result.response;
+
+    // Handle final response - check for auth errors that weren't handled by refresh
+    const finalResponseData = result.data || {};
+    const finalErrorMessage = finalResponseData.message || finalResponseData.error || '';
+    const isFinalJwtExpired = finalErrorMessage.toLowerCase().includes('jwt expired') || 
+                              finalErrorMessage.toLowerCase().includes('token expired') ||
+                              finalErrorMessage.toLowerCase().includes('expired');
+    
+    if ((result.response.status === 401 || result.response.status === 403 || isFinalJwtExpired) && !isRefreshing) {
+      // If we're not already refreshing and we got an auth error, try one more time with refresh
+      // This handles cases where the error message indicates expiration but status wasn't caught
+      if (retryOn401 && session?.refreshToken) {
+        const tokenAge = session?.loginTime ? Date.now() - session.loginTime : Infinity;
+        const isTokenTooFresh = tokenAge < 5000;
+        
+        if (!isTokenTooFresh) {
+          try {
+            const newAccessToken = await refreshAccessToken();
+            if (newAccessToken) {
+              // Retry the request with the new token
+              result = await makeRequest(newAccessToken);
+              // If retry succeeded, continue with the response
+              if (result.response.ok) {
+                if (raw) return result.response;
+                return result.data;
+              }
+            }
+          } catch (refreshError) {
+            // Refresh failed - will be handled by clearSession in refreshAccessToken
+            throw new Error('Token refresh failed');
+          }
+        }
+      }
+      
+      // If we get here, auth failed and refresh didn't work or wasn't attempted
+      const pathname = window.location.pathname.toLowerCase();
+      const isPublicPage = pathname.includes('login.html') || 
+                           pathname.includes('forgot-password.html') || 
+                           pathname.includes('reset-password.html');
+      
+      if (!isPublicPage) {
+        stopAllLoadingSpinners();
+        showToast('Session expired, please login again.', 'warning');
+        clearSession();
       }
       throw new Error('Unauthorized');
     }
 
     // Check for other errors (not auth errors)
     if (!result.response.ok || result.data.error) {
+      // Stop any loading spinners on error
+      stopAllLoadingSpinners();
       // Don't treat non-auth errors as session expiration
       throw new Error(result.data?.message || 'Request failed');
     }
@@ -436,6 +468,50 @@
     });
   };
 
+  // Global error handler to stop loading spinners on errors
+  const stopAllLoadingSpinners = () => {
+    // Remove all spinner elements
+    document.querySelectorAll('.spinner-border, .spinner-grow, [role="status"]').forEach(spinner => {
+      const parent = spinner.closest('tr, td, div');
+      if (parent) {
+        const text = parent.textContent || '';
+        if (text.includes('Loading') || text.includes('loading')) {
+          parent.style.display = 'none';
+        }
+      }
+    });
+    
+    // Hide loading overlays
+    document.querySelectorAll('.loading-overlay, .loader, [class*="loading"]').forEach(loader => {
+      if (loader.style) {
+        loader.style.display = 'none';
+      }
+    });
+  };
+
+  // Handle unhandled promise rejections to prevent infinite loading
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    stopAllLoadingSpinners();
+    
+    // If it's an auth error, ensure user is logged out
+    const errorMessage = event.reason?.message || String(event.reason || '');
+    if (errorMessage.includes('Unauthorized') || errorMessage.includes('expired') || errorMessage.includes('Token')) {
+      const pathname = window.location.pathname.toLowerCase();
+      const isPublicPage = pathname.includes('login.html') || 
+                           pathname.includes('forgot-password.html') || 
+                           pathname.includes('reset-password.html');
+      
+      if (!isPublicPage) {
+        setTimeout(() => {
+          if (window.location.pathname && !window.location.pathname.includes('login.html')) {
+            clearSession();
+          }
+        }, 100);
+      }
+    }
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     ensureAuth();
     updateHeaderUser();
@@ -451,6 +527,7 @@
     ensureAuth,
     updateHeaderUser,
     getApiBaseUrl: () => API_BASE_URL,
+    stopAllLoadingSpinners,
   };
 })();
 

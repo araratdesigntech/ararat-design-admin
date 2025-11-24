@@ -357,8 +357,8 @@
                 <div class="col-lg-6">
                   <div class="page-header-left">
                     <h3>
-                      Category
-                      <small>View and Manage yout categories here</small>
+                      Contact Messages
+                      <small>View all contact messages here</small>
                     </h3>
                   </div>
                 </div>
@@ -370,7 +370,7 @@
                       </a>
                     </li>
 
-                    <li class="breadcrumb-item active">Category</li>
+                    <li class="breadcrumb-item active">Contact</li>
                   </ol>
                 </div>
               </div>
@@ -384,47 +384,47 @@
               <div class="col-sm-12">
                 <div class="card">
                   <div class="card-header">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <div class="search-form">
                         <input
-                          id="categorySearch"
+                          id="contactSearch"
                           class="form-control"
                           type="search"
-                          placeholder="Search categories..."
+                          placeholder="Search contacts..."
                         />
                       </div>
                     </div>
-                    <div class="col-md-6 d-flex justify-content-end">
-                      <button
-                        type="button"
-                        class="btn btn-primary d-flex align-items-center"
-                        data-bs-toggle="modal"
-                        data-bs-target="#addCategoryModal"
-                      >
-                        <i data-feather="plus-circle" class="me-1"></i>
-                        Add Category
-                      </button>
+                    <div class="col-md-4">
+                      <select id="contactStatusFilter" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="new">New</option>
+                        <option value="read">Read</option>
+                        <option value="replied">Replied</option>
+                      </select>
                     </div>
+                    <div class="col-md-4"></div>
                   </div>
 
                   <div class="card-body">
                     <div class="table-responsive table-desi">
                       <table
                         class="table all-package table-category"
-                        id="categoryTable"
+                        id="contactTable"
                       >
                         <thead>
                           <tr>
-                            <th style="width: 100px">Image</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th style="width: 150px">Actions</th>
+                            <th>Name / Email</th>
+                            <th>Phone</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Date</th>
                           </tr>
                         </thead>
 
                         <tbody>
                           <tr>
-                            <td colspan="3" class="text-center">
+                            <td colspan="6" class="text-center">
                               <div
                                 class="spinner-border text-primary"
                                 role="status"
@@ -439,7 +439,7 @@
                   </div>
 
                   <!-- Pagination -->
-                  <div id="categoryPagination" class="card-footer"></div>
+                  <div id="contactPagination" class="card-footer"></div>
                 </div>
               </div>
             </div>
@@ -468,8 +468,9 @@
       </div>
     </div>
 
+    <!-- Modal removed for contact list - view only -->
     <!-- Modal -->
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" style="display: none;">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -585,11 +586,14 @@
     <script src="assets/js/config.js"></script>
     <script src="assets/js/auth.js"></script>
 
-  <!-- Category API -->
-  <script src="assets/js/categories-api.js"></script>
+    <!-- Admin App (must load before API services for token refresh) -->
+    <script src="assets/js/admin-app.js"></script>
 
-    <!-- Category Manager -->
-    <script src="assets/js/categories-manager.js"></script>
+  <!-- Contact API -->
+  <script src="assets/js/contact-api.js"></script>
+
+    <!-- Contact Manager -->
+    <script src="assets/js/contact-manager.js"></script>
 
     <!--script admin-->
     <script src="assets/js/admin-script.js"></script>
