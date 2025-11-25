@@ -142,9 +142,6 @@
     try {
       const apiBaseUrl = AdminApp.getApiBaseUrl();
       
-      // Use the invoice endpoint which streams the PDF directly
-      // We need to add authentication token to the URL or use a different approach
-      // Since window.open can't add headers, we'll fetch the PDF and create a blob URL
       const session = AdminApp.getSession && AdminApp.getSession();
       const token = session?.accessToken;
       
@@ -153,8 +150,6 @@
         return;
       }
       
-      // Construct URL with auth token as query param (if backend supports it) 
-      // or better: fetch and create blob URL
       const url = `${apiBaseUrl}/orders/invoices/${orderId}`;
       
       // Fetch the PDF with authentication
@@ -162,20 +157,55 @@
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
-        }
+        },
+        credentials: 'include'
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch invoice PDF');
+        // Try to get error message from response
+        let errorMessage = `Failed to download invoice: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData?.message || errorData?.error || errorMessage;
+        } catch (e) {
+          // Response is not JSON, use status text
+        }
+        throw new Error(errorMessage);
       }
       
-      // Create blob from response and open it
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
+      // Check if response is actually a PDF
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/pdf')) {
+        // Might be an error response, try to parse as JSON
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.message || errorData?.error || 'Invalid response format');
+      }
       
-      // Clean up blob URL after a delay
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+      // Get the blob
+      const blob = await response.blob();
+      
+      // Verify blob is not empty
+      if (blob.size === 0) {
+        throw new Error('Downloaded PDF is empty. Please try again.');
+      }
+      
+      // Create a download link
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `Invoice-${orderId}.pdf`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      }, 100);
+      
+      AdminApp.showToast('Invoice downloaded successfully!', 'success');
     } catch (error) {
       console.error('Invoice download error:', error);
       AdminApp.showToast(error.message || 'Unable to retrieve invoice.', 'danger');
