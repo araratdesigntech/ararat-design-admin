@@ -366,59 +366,19 @@
               <div class="col-sm-12">
                 <div class="card tab2-card">
                   <div class="card-body">
-                    <ul
-                      class="nav nav-tabs tab-coupon"
-                      id="myTab"
-                      role="tablist"
-                    >
-                      <li class="nav-item">
-                        <a
-                          class="nav-link active show"
-                          id="account-tab"
-                          data-bs-toggle="tab"
-                          href="#account"
-                          role="tab"
-                          aria-controls="account"
-                          aria-selected="true"
-                          data-original-title=""
-                          title=""
-                          >Account</a
-                        >
-                      </li>
-                      <li class="nav-item">
-                        <a
-                          class="nav-link"
-                          id="permission-tabs"
-                          data-bs-toggle="tab"
-                          href="#permission"
-                          role="tab"
-                          aria-controls="permission"
-                          aria-selected="false"
-                          data-original-title=""
-                          title=""
-                          >Permission</a
-                        >
-                      </li>
-                    </ul>
-                    <div class="tab-content" id="myTabContent">
-                      <div
-                        class="tab-pane fade active show"
-                        id="account"
-                        role="tabpanel"
-                        aria-labelledby="account-tab"
-                      >
-                        <form class="needs-validation user-add" novalidate="">
-                          <h4>Account Details</h4>
+                    <form class="needs-validation user-add" id="createUserForm" novalidate="" enctype="multipart/form-data">
+                      <h4>Account Details</h4>
                           <div class="form-group row">
                             <label
-                              for="validationCustom0"
+                              for="userName"
                               class="col-xl-3 col-md-4"
                               ><span>*</span> First Name</label
                             >
                             <div class="col-xl-8 col-md-7">
                               <input
                                 class="form-control"
-                                id="validationCustom0"
+                                id="userName"
+                                name="name"
                                 type="text"
                                 required=""
                               />
@@ -426,14 +386,15 @@
                           </div>
                           <div class="form-group row">
                             <label
-                              for="validationCustom1"
+                              for="userSurname"
                               class="col-xl-3 col-md-4"
                               ><span>*</span> Last Name</label
                             >
                             <div class="col-xl-8 col-md-7">
                               <input
                                 class="form-control"
-                                id="validationCustom1"
+                                id="userSurname"
+                                name="surname"
                                 type="text"
                                 required=""
                               />
@@ -441,29 +402,31 @@
                           </div>
                           <div class="form-group row">
                             <label
-                              for="validationCustom2"
+                              for="userEmail"
                               class="col-xl-3 col-md-4"
                               ><span>*</span> Email</label
                             >
                             <div class="col-xl-8 col-md-7">
                               <input
                                 class="form-control"
-                                id="validationCustom2"
-                                type="text"
+                                id="userEmail"
+                                name="email"
+                                type="email"
                                 required=""
                               />
                             </div>
                           </div>
                           <div class="form-group row">
                             <label
-                              for="validationCustom3"
+                              for="userPassword"
                               class="col-xl-3 col-md-4"
                               ><span>*</span> Password</label
                             >
                             <div class="col-xl-8 col-md-7">
                               <input
                                 class="form-control"
-                                id="validationCustom3"
+                                id="userPassword"
+                                name="password"
                                 type="password"
                                 required=""
                               />
@@ -471,290 +434,68 @@
                           </div>
                           <div class="form-group row">
                             <label
-                              for="validationCustom4"
+                              for="userConfirmPassword"
                               class="col-xl-3 col-md-4"
                               ><span>*</span> Confirm Password</label
                             >
                             <div class="col-xl-8 col-md-7">
                               <input
                                 class="form-control"
-                                id="validationCustom4"
+                                id="userConfirmPassword"
+                                name="confirmPassword"
                                 type="password"
                                 required=""
                               />
                             </div>
                           </div>
-                        </form>
-                      </div>
-                      <div
-                        class="tab-pane fade"
-                        id="permission"
-                        role="tabpanel"
-                        aria-labelledby="permission-tabs"
-                      >
-                        <form class="needs-validation user-add" novalidate="">
-                          <div class="permission-block">
-                            <div class="attribute-blocks">
-                              <h5 class="f-w-600 mb-3">
-                                Product Related permition
-                              </h5>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label>Add Product</label>
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated"
-                                  >
-                                    <label class="d-block" for="edo-ani1">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani1"
-                                        type="radio"
-                                        name="rdo-ani"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block" for="edo-ani2">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani2"
-                                        type="radio"
-                                        name="rdo-ani"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label>Update Product</label>
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated"
-                                  >
-                                    <label class="d-block" for="edo-ani3">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani3"
-                                        type="radio"
-                                        name="rdo-ani1"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block" for="edo-ani4">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani4"
-                                        type="radio"
-                                        name="rdo-ani1"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label>Delete Product</label>
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated"
-                                  >
-                                    <label class="d-block" for="edo-ani5">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani5"
-                                        type="radio"
-                                        name="rdo-ani2"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block" for="edo-ani6">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani6"
-                                        type="radio"
-                                        name="rdo-ani2"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label class="mb-0 sm-label-radio"
-                                    >Apply discount</label
-                                  >
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated pb-0"
-                                  >
-                                    <label class="d-block mb-0" for="edo-ani7">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani7"
-                                        type="radio"
-                                        name="rdo-ani3"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block mb-0" for="edo-ani8">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani8"
-                                        type="radio"
-                                        name="rdo-ani3"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
+                          <div class="form-group row">
+                            <label
+                              for="userRole"
+                              class="col-xl-3 col-md-4"
+                              ><span>*</span> Role</label
+                            >
+                            <div class="col-xl-8 col-md-7">
+                              <select
+                                class="form-control"
+                                id="userRole"
+                                name="role"
+                                required=""
+                              >
+                                <option value="">Select Role</option>
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                                <option value="manger">Manager</option>
+                                <option value="supervisor">Supervisor</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="client">Client</option>
+                                <option value="guide">Guide</option>
+                              </select>
                             </div>
-                            <div class="attribute-blocks">
-                              <h5 class="f-w-600 mb-3">
-                                Category Related permition
-                              </h5>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label>Add Category</label>
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated"
-                                  >
-                                    <label class="d-block" for="edo-ani9">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani9"
-                                        type="radio"
-                                        name="rdo-ani4"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block" for="edo-ani10">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani10"
-                                        type="radio"
-                                        name="rdo-ani4"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label>Update Category</label>
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated"
-                                  >
-                                    <label class="d-block" for="edo-ani11">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani11"
-                                        type="radio"
-                                        name="rdo-ani5"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block" for="edo-ani12">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani12"
-                                        type="radio"
-                                        name="rdo-ani5"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label>Delete Category</label>
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline mb-0 custom-radio-ml d-flex radio-animated"
-                                  >
-                                    <label class="d-block" for="edo-ani13">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani13"
-                                        type="radio"
-                                        name="rdo-ani6"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block" for="edo-ani14">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani14"
-                                        type="radio"
-                                        name="rdo-ani6"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <div class="col-xl-3 col-sm-4">
-                                  <label class="mb-0 sm-label-radio"
-                                    >Apply discount</label
-                                  >
-                                </div>
-                                <div class="col-xl-9 col-sm-8">
-                                  <div
-                                    class="form-group m-checkbox-inline custom-radio-ml d-flex radio-animated pb-0"
-                                  >
-                                    <label class="d-block mb-0" for="edo-ani15">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani15"
-                                        type="radio"
-                                        name="rdo-ani7"
-                                      />
-                                      Allow
-                                    </label>
-                                    <label class="d-block mb-0" for="edo-ani16">
-                                      <input
-                                        class="radio_animated"
-                                        id="edo-ani16"
-                                        type="radio"
-                                        name="rdo-ani7"
-                                        checked=""
-                                      />
-                                      Deny
-                                    </label>
-                                  </div>
-                                </div>
-                              </div>
+                          </div>
+                          <div class="form-group row">
+                            <label
+                              for="userProfileImage"
+                              class="col-xl-3 col-md-4"
+                              >Profile Image</label
+                            >
+                            <div class="col-xl-8 col-md-7">
+                              <input
+                                class="form-control"
+                                id="userProfileImage"
+                                name="profileImage"
+                                type="file"
+                                accept="image/*"
+                              />
+                              <small class="form-text text-muted">Optional: Upload a profile image</small>
                             </div>
                           </div>
                         </form>
-                      </div>
-                    </div>
                     <div class="pull-right">
-                      <button type="button" class="btn btn-primary">
+                      <button type="button" class="btn btn-primary" id="saveUserBtn">
                         Save
+                      </button>
+                      <button type="button" class="btn btn-secondary" id="cancelUserBtn" style="margin-left: 10px;">
+                        Cancel
                       </button>
                     </div>
                   </div>
@@ -815,5 +556,11 @@
 
     <!--script admin-->
     <script src="assets/js/admin-script.js"></script>
+    
+    <!-- Admin App (must load before create-user script) -->
+    <script src="assets/js/admin-app.js"></script>
+    
+    <!-- Create User Script -->
+    <script src="assets/js/create-user.js"></script>
   </body>
 </html>
