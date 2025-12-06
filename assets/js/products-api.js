@@ -81,6 +81,14 @@ class ProductAPI {
      */
     async getProductById(id) {
         try {
+            // Wait for AdminApp to be available
+            if (window.AdminApp && window.AdminApp.request) {
+                return await window.AdminApp.request(`/admin/products/${id}`, {
+                    method: 'GET'
+                });
+            }
+            
+            // Fallback to direct fetch if AdminApp not available
             const response = await fetch(`${this.apiBaseUrl}/admin/products/${id}`, {
                 method: 'GET',
                 headers: this.getAuthHeaders()
@@ -131,6 +139,15 @@ class ProductAPI {
      */
     async updateProduct(id, formData) {
         try {
+            // Wait for AdminApp to be available
+            if (window.AdminApp && window.AdminApp.request) {
+                return await window.AdminApp.request(`/admin/products/update/${id}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+            }
+            
+            // Fallback to direct fetch if AdminApp not available
             const headers = {};
             const token = localStorage.getItem('admin_session');
             const session = token ? JSON.parse(token) : null;
@@ -139,8 +156,8 @@ class ProductAPI {
                 headers['Authorization'] = `Bearer ${session.accessToken}`;
             }
 
-            const response = await fetch(`${this.apiBaseUrl}/admin/products/${id}`, {
-                method: 'PATCH',
+            const response = await fetch(`${this.apiBaseUrl}/admin/products/update/${id}`, {
+                method: 'PUT',
                 headers: headers,
                 body: formData
             });

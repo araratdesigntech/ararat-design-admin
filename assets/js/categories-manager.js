@@ -293,6 +293,7 @@ class CategoryManager {
         // Populate form
         $("#categoryName").val(category.name);
         $("#categoryDescription").val(category.description || "");
+        $("#categoryMinimumAmount").val(category.minimumAmount || "");
 
         // Show current image
         if (category.image) {
